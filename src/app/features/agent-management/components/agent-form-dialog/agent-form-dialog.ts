@@ -10,7 +10,7 @@ import { Agent, AgentCreateInput, AgentStatus, AgentUpdateInput } from '../../mo
       <div class="modal-backdrop" (click)="onCancel()">
         <div class="modal-container" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="modal-title">
           <div class="modal-header">
-            <h2 id="modal-title">{{ isEdit() ? 'Edit Agent Profile' : 'Add New Support Agent' }}</h2>
+            <h2 id="modal-title">{{ isEdit ? 'Edit Agent Profile' : 'Add New Support Agent' }}</h2>
             <button type="button" class="close-btn" (click)="onCancel()" aria-label="Close dialog">✕</button>
           </div>
 
@@ -93,7 +93,7 @@ import { Agent, AgentCreateInput, AgentStatus, AgentUpdateInput } from '../../mo
             <div class="modal-footer">
               <button type="button" class="btn-secondary" (click)="onCancel()">Cancel</button>
               <button type="submit" class="btn-primary" [disabled]="form.invalid">
-                {{ isEdit() ? 'Save Changes' : 'Create Agent' }}
+                {{ isEdit ? 'Save Changes' : 'Create Agent' }}
               </button>
             </div>
           </form>
