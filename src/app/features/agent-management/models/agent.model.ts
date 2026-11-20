@@ -1,4 +1,4 @@
-export type AgentStatus = 'Active' | 'Inactive' | 'Available' | 'Offline' | 'On Break';
+export type AgentStatus = string;
 
 export interface Agent extends Record<string, unknown> {
   id: string;

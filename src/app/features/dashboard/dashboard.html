@@ -1,20 +1,36 @@
 <section class="dashboard-page">
   <div class="page-heading">
-    <div><div class="eyebrow"><span class="live-dot"></span> NOVEMBER 19, 2026</div><h1>Good morning, Alex <span class="wave">✦</span></h1><p>Here’s what’s happening with your support team today.</p></div>
-    <a class="button button-primary" routerLink="/tickets"><span>＋</span> Create ticket</a>
+    <div>
+      <div class="eyebrow"><span class="live-dot"></span> LIVE SUPPORT DATA</div>
+      <h1>Support overview <span class="wave">✦</span></h1>
+      <p>Current ticket records from the Django GraphQL API.</p>
+    </div>
   </div>
 
   <div class="metric-grid">
-    <article class="metric-card"><div class="metric-top"><span class="metric-label">Total tickets</span><span class="metric-icon metric-blue">▤</span></div><div class="metric-value">1,284</div><div class="metric-foot"><span class="trend trend-up">↗ 12.8%</span><span>vs last month</span><span class="sparkline spark-blue">▁▂▂▄▃▅▆▅▇</span></div></article>
-    <article class="metric-card"><div class="metric-top"><span class="metric-label">Open tickets</span><span class="metric-icon metric-amber">◷</span></div><div class="metric-value">48</div><div class="metric-foot"><span class="trend trend-down">↘ 4.2%</span><span>vs last week</span><span class="sparkline spark-amber">▆▅▆▄▅▃▄▂▃</span></div></article>
-    <article class="metric-card"><div class="metric-top"><span class="metric-label">Avg. response time</span><span class="metric-icon metric-violet">◴</span></div><div class="metric-value">2h 24m</div><div class="metric-foot"><span class="trend trend-up">↗ 8.1%</span><span>faster this month</span><span class="sparkline spark-violet">▇▆▅▆▄▃▄▂▁</span></div></article>
-    <article class="metric-card"><div class="metric-top"><span class="metric-label">Customer satisfaction</span><span class="metric-icon metric-green">♡</span></div><div class="metric-value">96.8<span class="metric-unit">%</span></div><div class="metric-foot"><span class="trend trend-up">↗ 2.4%</span><span>vs last month</span><span class="sparkline spark-green">▃▄▃▅▄▆▅▇▇</span></div></article>
+    <article class="metric-card">
+      <div class="metric-top"><span class="metric-label">Total tickets</span><span class="metric-icon metric-blue">▤</span></div>
+      <div class="metric-value">{{ totalTickets() ?? '—' }}</div>
+      <div class="metric-foot"><span>Reported by the backend</span></div>
+    </article>
+    <article class="metric-card"><div class="metric-top"><span class="metric-label">Open tickets</span><span class="metric-icon metric-amber">◷</span></div><div class="metric-value">—</div><div class="metric-foot"><span>No aggregate query is exposed</span></div></article>
+    <article class="metric-card"><div class="metric-top"><span class="metric-label">Avg. response time</span><span class="metric-icon metric-violet">◴</span></div><div class="metric-value">—</div><div class="metric-foot"><span>No aggregate query is exposed</span></div></article>
+    <article class="metric-card"><div class="metric-top"><span class="metric-label">Customer satisfaction</span><span class="metric-icon metric-green">♡</span></div><div class="metric-value">—</div><div class="metric-foot"><span>No aggregate query is exposed</span></div></article>
   </div>
 
-  <div class="overview-grid">
-    <section class="panel volume-panel"><div class="panel-heading"><div><h2>Ticket volume</h2><p>Incoming tickets over the last 7 days</p></div><button class="select-button" type="button">This week <span>⌄</span></button></div><div class="chart-area" role="img" aria-label="Ticket volume chart shows a gradual increase from Monday to Sunday"><div class="chart-y-labels"><span>200</span><span>150</span><span>100</span><span>50</span><span>0</span></div><div class="chart-content"><div class="chart-gridlines"><i></i><i></i><i></i><i></i><i></i></div><div class="bar-chart"><div class="bar-group"><div class="bar bar-muted" style="height: 48%"></div><div class="bar bar-primary" style="height: 32%"></div><span>Mon</span></div><div class="bar-group"><div class="bar bar-muted" style="height: 58%"></div><div class="bar bar-primary" style="height: 42%"></div><span>Tue</span></div><div class="bar-group"><div class="bar bar-muted" style="height: 45%"></div><div class="bar bar-primary" style="height: 37%"></div><span>Wed</span></div><div class="bar-group"><div class="bar bar-muted" style="height: 76%"></div><div class="bar bar-primary" style="height: 52%"></div><span>Thu</span></div><div class="bar-group"><div class="bar bar-muted" style="height: 62%"></div><div class="bar bar-primary" style="height: 46%"></div><span>Fri</span></div><div class="bar-group"><div class="bar bar-muted" style="height: 88%"></div><div class="bar bar-primary" style="height: 68%"></div><span>Sat</span></div><div class="bar-group"><div class="bar bar-muted" style="height: 66%"></div><div class="bar bar-primary" style="height: 54%"></div><span>Sun</span></div></div></div></div><div class="chart-legend"><span><i class="legend-dot legend-current"></i>This week</span><span><i class="legend-dot legend-previous"></i>Last week</span></div></section>
-    <section class="panel status-panel"><div class="panel-heading"><div><h2>Ticket status</h2><p>Current ticket distribution</p></div><button class="more-button" type="button" aria-label="More status options">···</button></div><div class="donut-wrap"><div class="donut-chart"><div class="donut-hole"><strong>1,284</strong><span>Total tickets</span></div></div></div><div class="status-legend"><div><span class="status-name"><i class="legend-dot status-open"></i>Open</span><strong>48 <small>3.7%</small></strong></div><div><span class="status-name"><i class="legend-dot status-progress"></i>In progress</span><strong>186 <small>14.5%</small></strong></div><div><span class="status-name"><i class="legend-dot status-resolved"></i>Resolved</span><strong>1,050 <small>81.8%</small></strong></div></div></section>
-  </div>
-
-  <section class="panel tickets-panel"><div class="panel-heading tickets-heading"><div><h2>Recent tickets</h2><p>Stay on top of the latest customer requests</p></div><a class="text-link" routerLink="/tickets">View all tickets <span>→</span></a></div><app-data-table [columns]="columns" [data]="tickets"></app-data-table></section>
+  <section class="panel tickets-panel">
+    <div class="panel-heading tickets-heading">
+      <div><h2>Recent tickets</h2><p>Latest ticket records returned by the backend</p></div>
+    </div>
+    @if (error()) {
+      <p class="dashboard-error" role="alert">{{ error() }}</p>
+    }
+    <app-data-table
+      [columns]="columns"
+      [data]="tickets()"
+      [loading]="loading()"
+      [emptyTitle]="'No tickets available'"
+      [emptyMessage]="'The backend has not returned any ticket records.'"
+    ></app-data-table>
+  </section>
 </section>

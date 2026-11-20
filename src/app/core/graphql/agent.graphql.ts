@@ -19,78 +19,18 @@ export const GET_AGENTS_QUERY = `
   }
 `;
 
-export const GET_AGENT_STATS_QUERY = `
-  query GetAgentStats {
-    agentStats {
-      totalAgents
-      activeAgents
-      inactiveAgents
-      availableAgents
-    }
-  }
-`;
-
 export const GET_AGENT_BY_ID_QUERY = `
-  query GetAgentById($id: ID!) {
-    agent(id: $id) {
-      id
+  query GetAgentById($agentId: Int!) {
+    agentById(agentId: $agentId) {
       agentId
-      name
-      email
-      phone
       department
-      role
-      status
-      createdAt
-    }
-  }
-`;
-
-export const CREATE_AGENT_MUTATION = `
-  mutation CreateAgent($input: AgentCreateInput!) {
-    createAgent(input: $input) {
-      agent {
-        id
-        agentId
-        name
+      availabilityStatus
+      userId {
+        fullName
         email
-        phone
-        department
         role
-        status
         createdAt
       }
-      errors
-      success
-    }
-  }
-`;
-
-export const UPDATE_AGENT_MUTATION = `
-  mutation UpdateAgent($id: ID!, $input: AgentUpdateInput!) {
-    updateAgent(id: $id, input: $input) {
-      agent {
-        id
-        agentId
-        name
-        email
-        phone
-        department
-        role
-        status
-        createdAt
-      }
-      errors
-      success
-    }
-  }
-`;
-
-export const DELETE_AGENT_MUTATION = `
-  mutation DeleteAgent($id: ID!) {
-    deleteAgent(id: $id) {
-      success
-      errors
     }
   }
 `;

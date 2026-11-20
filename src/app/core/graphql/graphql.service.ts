@@ -9,9 +9,7 @@ export class GraphQLService {
   private readonly http = inject(HttpClient);
   private readonly endpoint = environment.graphqlUri;
 
-  /**
-   * Executes a GraphQL Query.
-   */
+  
   query<T, V extends Record<string, unknown> = Record<string, unknown>>(
     query: string,
     variables?: V
@@ -19,9 +17,7 @@ export class GraphQLService {
     return this.execute<T, V>({ query, variables });
   }
 
-  /**
-   * Executes a GraphQL Mutation.
-   */
+
   mutate<T, V extends Record<string, unknown> = Record<string, unknown>>(
     mutation: string,
     variables?: V

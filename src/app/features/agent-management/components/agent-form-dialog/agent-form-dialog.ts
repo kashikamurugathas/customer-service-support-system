@@ -81,8 +81,12 @@ import { Agent, AgentCreateInput, AgentStatus, AgentUpdateInput } from '../../mo
               <div class="form-group full-width">
                 <label for="agentStatus">Status <span class="required">*</span></label>
                 <select id="agentStatus" formControlName="status">
-                  <option value="Active">Active (Handling tickets)</option>
-                  <option value="Available">Available (Ready for queue)</option>
+                  @if (agent() && !['Working', 'Active', 'Available', 'Inactive', 'On Break', 'Offline'].includes(agent()!.status)) {
+                    <option [value]="agent()!.status">{{ agent()!.status }}</option>
+                  }
+                  <option value="Working">Working</option>
+                  <option value="Active">Active</option>
+                  <option value="Available">Available</option>
                   <option value="Inactive">Inactive</option>
                   <option value="On Break">On Break</option>
                   <option value="Offline">Offline</option>

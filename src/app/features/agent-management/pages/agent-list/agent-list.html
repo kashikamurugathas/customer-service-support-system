@@ -19,10 +19,10 @@
     <div class="connection-status">
       <span class="status-dot"></span>
       @if (agentService.backendConnected()) {
-        <span>Connected to live Django GraphQL backend (<code>http://localhost:8000/graphql</code>)</span>
+        <span>Connected to live Django GraphQL backend (<code>http://localhost:8000/graphql/</code>)</span>
       } @else {
         <span>
-          Django GraphQL server offline (<code>http://localhost:8000/graphql</code>). Operating in local baseline mode.
+          Django GraphQL API is unavailable (<code>http://localhost:8000/graphql/</code>). No local demo records are shown.
         </span>
       }
     </div>
@@ -60,49 +60,37 @@
           role="tab"
           [attr.aria-selected]="activeStatusFilter() === 'ALL'"
         >
-          All ({{ agentService.agents().length }})
+          All ({{ agentService.totalCount() }})
         </button>
-        <button
-          type="button"
-          class="tab-btn"
-          [class.active]="activeStatusFilter() === 'Active'"
-          (click)="setStatusFilter('Active')"
-          role="tab"
-          [attr.aria-selected]="activeStatusFilter() === 'Active'"
-        >
-          Active
-        </button>
-        <button
-          type="button"
-          class="tab-btn"
-          [class.active]="activeStatusFilter() === 'Available'"
-          (click)="setStatusFilter('Available')"
-          role="tab"
-          [attr.aria-selected]="activeStatusFilter() === 'Available'"
-        >
-          Available
-        </button>
-        <button
-          type="button"
-          class="tab-btn"
-          [class.active]="activeStatusFilter() === 'Inactive'"
-          (click)="setStatusFilter('Inactive')"
-          role="tab"
-          [attr.aria-selected]="activeStatusFilter() === 'Inactive'"
-        >
-          Inactive
-        </button>
+        @for (status of statusOptions(); track status) {
+          <button
+            type="button"
+            class="tab-btn"
+            [class.active]="activeStatusFilter() === status"
+            (click)="setStatusFilter(status)"
+            role="tab"
+            [attr.aria-selected]="activeStatusFilter() === status"
+          >
+            {{ status }}
+          </button>
+        }
       </div>
     </div>
 
     <!-- Advanced Reusable Data Table -->
     <app-data-table
       [columns]="columns"
-      [data]="filteredAgents()"
+      [data]="agentService.agents()"
       [loading]="agentService.loading()"
+      [serverSide]="true"
+      [totalRecords]="agentService.totalCount()"
       [searchable]="true"
       [paginated]="true"
-      [pageSize]="10"
+      [(pageSize)]="pageSize"
+      [(currentPage)]="page"
+      (currentPageChange)="loadAgents()"
+      (pageSizeChange)="loadAgents()"
+      (searchChange)="onSearch($event)"
       [showActions]="true"
       (view)="onViewAgent($event)"
       (edit)="onEditAgent($event)"

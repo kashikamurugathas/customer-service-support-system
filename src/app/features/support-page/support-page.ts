@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { UpperCasePipe } from '@angular/common';
 import { DataTable, TableColumn } from '../../shared/components/data-table/data-table';
 
@@ -14,7 +14,7 @@ interface SupportPageConfig {
 
 @Component({
   selector: 'app-support-page',
-  imports: [DataTable, RouterLink, UpperCasePipe],
+  imports: [DataTable, UpperCasePipe],
   templateUrl: './support-page.html',
   styleUrl: './support-page.css',
 })

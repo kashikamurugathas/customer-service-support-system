@@ -11,7 +11,7 @@ import { AgentStats } from '../../models/agent.model';
           <span class="stat-label">Total Agents</span>
           <span class="stat-icon icon-blue">♙</span>
         </div>
-        <div class="stat-value">{{ stats()?.totalAgents ?? 0 }}</div>
+        <div class="stat-value">{{ stats()?.totalAgents ?? '—' }}</div>
         <div class="stat-sub">Across all departments</div>
       </div>
 
@@ -20,7 +20,7 @@ import { AgentStats } from '../../models/agent.model';
           <span class="stat-label">Active Agents</span>
           <span class="stat-icon icon-green">●</span>
         </div>
-        <div class="stat-value">{{ stats()?.activeAgents ?? 0 }}</div>
+        <div class="stat-value">{{ stats()?.activeAgents ?? '—' }}</div>
         <div class="stat-sub">Currently handling tickets</div>
       </div>
 
@@ -29,7 +29,7 @@ import { AgentStats } from '../../models/agent.model';
           <span class="stat-label">Available</span>
           <span class="stat-icon icon-violet">✓</span>
         </div>
-        <div class="stat-value">{{ stats()?.availableAgents ?? 0 }}</div>
+        <div class="stat-value">{{ stats()?.availableAgents ?? '—' }}</div>
         <div class="stat-sub">Ready for incoming requests</div>
       </div>
 
@@ -38,7 +38,7 @@ import { AgentStats } from '../../models/agent.model';
           <span class="stat-label">Inactive / Offline</span>
           <span class="stat-icon icon-amber">○</span>
         </div>
-        <div class="stat-value">{{ stats()?.inactiveAgents ?? 0 }}</div>
+        <div class="stat-value">{{ stats()?.inactiveAgents ?? '—' }}</div>
         <div class="stat-sub">On break or off shift</div>
       </div>
     </div>

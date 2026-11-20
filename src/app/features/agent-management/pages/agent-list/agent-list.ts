@@ -23,6 +23,10 @@ export class AgentListPage {
   readonly agentService = inject(AgentService);
 
   readonly activeStatusFilter = signal<string>('ALL');
+  readonly search = signal('');
+  readonly page = signal(1);
+  readonly pageSize = signal(10);
+  readonly statusOptions = computed(() => this.agentService.availableStatuses());
 
   // Modal states
   readonly formDialogOpen = signal<boolean>(false);
@@ -44,15 +48,25 @@ export class AgentListPage {
     { key: 'actions', label: 'Actions', type: 'actions' },
   ];
 
-  readonly filteredAgents = computed(() => {
-    const status = this.activeStatusFilter();
-    const agents = this.agentService.agents();
-    if (status === 'ALL') return agents;
-    return agents.filter((a) => a.status === status);
-  });
-
   setStatusFilter(status: string): void {
     this.activeStatusFilter.set(status);
+    this.page.set(1);
+    this.loadAgents();
+  }
+
+  loadAgents(): void {
+    this.agentService.loadAgents({
+      search: this.search(),
+      status: this.activeStatusFilter(),
+      page: this.page(),
+      pageSize: this.pageSize(),
+    });
+  }
+
+  onSearch(search: string): void {
+    this.search.set(search);
+    this.page.set(1);
+    this.loadAgents();
   }
 
   openCreateDialog(): void {
@@ -80,26 +94,32 @@ export class AgentListPage {
   onConfirmDelete(): void {
     const agent = this.agentToDelete();
     if (agent) {
-      this.agentService.deleteAgent(agent.id).subscribe();
-      this.deleteDialogOpen.set(false);
-      this.agentToDelete.set(null);
+      this.agentService.deleteAgent(agent.id).subscribe((deleted) => {
+        if (!deleted) return;
+        this.loadAgents();
+        this.deleteDialogOpen.set(false);
+        this.agentToDelete.set(null);
+      });
     }
   }
 
   onSaveAgent(event: { isEdit: boolean; id?: string; data: AgentCreateInput | AgentUpdateInput }): void {
     if (event.isEdit && event.id) {
-      this.agentService.updateAgent(event.id, event.data as AgentUpdateInput).subscribe(() => {
+      this.agentService.updateAgent(event.id, event.data as AgentUpdateInput).subscribe((updated) => {
+        if (!updated) return;
+        this.loadAgents();
         this.formDialogOpen.set(false);
       });
     } else {
-      this.agentService.createAgent(event.data as AgentCreateInput).subscribe(() => {
+      this.agentService.createAgent(event.data as AgentCreateInput).subscribe((created) => {
+        if (!created) return;
+        this.loadAgents();
         this.formDialogOpen.set(false);
       });
     }
   }
 
   reconnect(): void {
-    this.agentService.loadAgents();
-    this.agentService.loadStats();
+    this.loadAgents();
   }
 }
