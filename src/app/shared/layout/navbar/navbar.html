@@ -1,0 +1,12 @@
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="icon-button menu-button" type="button" aria-label="Open navigation" (click)="menuToggle.emit()">☰</button>
+    <div class="breadcrumb"><span>Workspace</span><span class="breadcrumb-separator">/</span><strong>Support center</strong></div>
+  </div>
+  <div class="topbar-actions">
+    <label class="top-search"><span aria-hidden="true">⌕</span><input type="search" placeholder="Search tickets…" aria-label="Search tickets" (keydown.enter)="searchTickets($event)" /></label>
+    <div class="notification-wrap"><button class="icon-button notification-button" type="button" aria-label="Notifications" [attr.aria-expanded]="notificationOpen()" (click)="toggleNotifications()">♧<span class="notification-dot"></span></button>@if (notificationOpen()) { <div class="notification-popover" role="status"><strong>You’re all caught up</strong><p>New ticket updates will appear here.</p></div> }</div>
+    <span class="topbar-divider"></span>
+    <div class="user-chip"><span class="avatar">AS</span><span class="user-copy"><strong>Alex Smith</strong><small>Administrator</small></span><span class="chevron">⌄</span></div>
+  </div>
+</header>

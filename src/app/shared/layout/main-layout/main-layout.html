@@ -1,0 +1,9 @@
+<div class="app-shell">
+  <app-sidebar [class.sidebar-open]="menuOpen()" (navigate)="closeMenu()"></app-sidebar>
+  @if (menuOpen()) { <button class="mobile-scrim" aria-label="Close navigation" (click)="closeMenu()"></button> }
+  <div class="main-column">
+    <app-navbar (menuToggle)="toggleMenu()"></app-navbar>
+    <main class="page-content"><router-outlet></router-outlet></main>
+    <footer class="app-footer">© 2026 SupportDesk <span>•</span> Built for better customer care</footer>
+  </div>
+</div>

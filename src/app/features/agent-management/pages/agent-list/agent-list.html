@@ -1,0 +1,139 @@
+<section class="agent-page">
+
+  <!-- Header -->
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">CUSTOMER OPERATIONS <span>/</span> AGENT MANAGEMENT</div>
+      <h1>Support Agents</h1>
+      <p>Manage and monitor your customer service representatives, workload and departments.</p>
+    </div>
+    <div class="heading-actions">
+      <button type="button" class="btn-create" (click)="openCreateDialog()">
+        <span>＋</span> Add Agent
+      </button>
+    </div>
+  </div>
+
+  <!-- Backend Connection Status Banner -->
+  <div class="connection-bar" [class.connected]="agentService.backendConnected()">
+    <div class="connection-status">
+      <span class="status-dot"></span>
+      @if (agentService.backendConnected()) {
+        <span>Connected to live Django GraphQL backend (<code>http://localhost:8000/graphql</code>)</span>
+      } @else {
+        <span>
+          Django GraphQL server offline (<code>http://localhost:8000/graphql</code>). Operating in local baseline mode.
+        </span>
+      }
+    </div>
+    <button type="button" class="btn-reconnect" (click)="reconnect()" [disabled]="agentService.loading()">
+      {{ agentService.loading() ? 'Checking…' : 'Check backend' }}
+    </button>
+  </div>
+
+  <!-- User Feedback Toast / Alert -->
+  @if (agentService.feedback(); as fb) {
+    <div class="feedback-banner" [class.feedback-success]="fb.type === 'success'" [class.feedback-error]="fb.type === 'error'" role="alert">
+      <span>{{ fb.message }}</span>
+      <button type="button" class="feedback-close" (click)="agentService.clearFeedback()" aria-label="Dismiss message">✕</button>
+    </div>
+  }
+
+  <!-- Dashboard Summary Cards -->
+  <app-agent-stats [stats]="agentService.stats()"></app-agent-stats>
+
+  <!-- Filter Tabs & Directory Table Panel -->
+  <div class="table-panel">
+    <div class="panel-header">
+      <div>
+        <h2>Agent Directory</h2>
+        <p>Browse, search, and manage representative profiles.</p>
+      </div>
+
+      <!-- Status Filter Tabs -->
+      <div class="filter-tabs" role="tablist" aria-label="Filter agents by status">
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="activeStatusFilter() === 'ALL'"
+          (click)="setStatusFilter('ALL')"
+          role="tab"
+          [attr.aria-selected]="activeStatusFilter() === 'ALL'"
+        >
+          All ({{ agentService.agents().length }})
+        </button>
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="activeStatusFilter() === 'Active'"
+          (click)="setStatusFilter('Active')"
+          role="tab"
+          [attr.aria-selected]="activeStatusFilter() === 'Active'"
+        >
+          Active
+        </button>
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="activeStatusFilter() === 'Available'"
+          (click)="setStatusFilter('Available')"
+          role="tab"
+          [attr.aria-selected]="activeStatusFilter() === 'Available'"
+        >
+          Available
+        </button>
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="activeStatusFilter() === 'Inactive'"
+          (click)="setStatusFilter('Inactive')"
+          role="tab"
+          [attr.aria-selected]="activeStatusFilter() === 'Inactive'"
+        >
+          Inactive
+        </button>
+      </div>
+    </div>
+
+    <!-- Advanced Reusable Data Table -->
+    <app-data-table
+      [columns]="columns"
+      [data]="filteredAgents()"
+      [loading]="agentService.loading()"
+      [searchable]="true"
+      [paginated]="true"
+      [pageSize]="10"
+      [showActions]="true"
+      (view)="onViewAgent($event)"
+      (edit)="onEditAgent($event)"
+      (delete)="onPromptDelete($event)"
+    ></app-data-table>
+  </div>
+
+  <!-- Add / Edit Modal -->
+  <app-agent-form-dialog
+    [visible]="formDialogOpen()"
+    [agent]="selectedAgentForEdit()"
+    (close)="formDialogOpen.set(false)"
+    (save)="onSaveAgent($event)"
+  ></app-agent-form-dialog>
+
+  <!-- Detail Modal -->
+  <app-agent-detail-dialog
+    [visible]="detailDialogOpen()"
+    [agent]="selectedAgentForDetail()"
+    (close)="detailDialogOpen.set(false)"
+    (edit)="onEditAgent($event)"
+  ></app-agent-detail-dialog>
+
+  <!-- Delete Confirm Dialog -->
+  <app-confirm-dialog
+    [visible]="deleteDialogOpen()"
+    title="Delete Agent"
+    [message]="'Are you sure you want to remove agent ' + (agentToDelete()?.name || '') + ' (' + (agentToDelete()?.agentId || '') + ')? This will unassign all related tickets.'"
+    confirmLabel="Delete Agent"
+    (confirm)="onConfirmDelete()"
+    (cancel)="deleteDialogOpen.set(false)"
+  ></app-confirm-dialog>
+
+</section>

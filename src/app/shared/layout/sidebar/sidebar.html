@@ -1,0 +1,22 @@
+<aside class="sidebar">
+  <a class="brand" routerLink="/dashboard" (click)="navigate.emit()" aria-label="SupportDesk home">
+    <span class="brand-mark">S</span><span class="brand-name">support<span>desk</span><small>CUSTOMER OPERATIONS</small></span>
+  </a>
+  <div class="workspace-label">WORKSPACE</div>
+  <nav class="side-nav" aria-label="Main navigation">
+    <a routerLink="/dashboard" routerLinkActive="nav-active" [routerLinkActiveOptions]="{ exact: true }" (click)="navigate.emit()"><span class="nav-icon">▦</span>Overview</a>
+    <div class="nav-section-label">MANAGE</div>
+    <a routerLink="/tickets" routerLinkActive="nav-active" (click)="navigate.emit()"><span class="nav-icon">▤</span>Tickets<span class="nav-count">8</span></a>
+    <a routerLink="/agents" routerLinkActive="nav-active" (click)="navigate.emit()"><span class="nav-icon">♙</span>Agents</a>
+    <a routerLink="/complaints" routerLinkActive="nav-active" (click)="navigate.emit()"><span class="nav-icon">⚑</span>Complaints</a>
+    <a routerLink="/feedback" routerLinkActive="nav-active" (click)="navigate.emit()"><span class="nav-icon">☆</span>Feedback</a>
+    <div class="nav-section-label">INSIGHTS</div>
+    <a routerLink="/priorities" routerLinkActive="nav-active" (click)="navigate.emit()"><span class="nav-icon">◈</span>Priorities</a>
+    <a routerLink="/reports" routerLinkActive="nav-active" (click)="navigate.emit()"><span class="nav-icon">▥</span>Reports</a>
+    <a routerLink="/service-level" routerLinkActive="nav-active" (click)="navigate.emit()"><span class="nav-icon">◷</span>Service levels</a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="help-card"><span class="help-icon">?</span><strong>Need a hand?</strong><p>Visit our help center for tips and answers.</p><a routerLink="/help" (click)="navigate.emit()">Visit help center <span>↗</span></a></div>
+    <div class="sidebar-profile"><span class="avatar avatar-sidebar">AS</span><span><strong>Alex Smith</strong><small>Admin account</small></span><button class="profile-menu" aria-label="Account options">···</button></div>
+  </div>
+</aside>

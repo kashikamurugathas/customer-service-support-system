@@ -1,0 +1,5 @@
+<section class="support-page">
+  <div class="support-heading"><div><div class="eyebrow">CUSTOMER OPERATIONS <span>/</span> {{ page.title | uppercase }}</div><h1>{{ page.title }}</h1><p>{{ page.description }}</p></div><a class="button button-primary" routerLink="/tickets"><span>＋</span> Create ticket</a></div>
+  <div class="support-summary"><div class="summary-icon">▤</div><div><span>{{ page.metricLabel }}</span><strong>{{ page.metric }}</strong></div><small><i></i>Updated just now</small></div>
+  <section class="panel records-panel"><div class="records-header"><div><h2>{{ page.title }} directory</h2><p>Browse and search your {{ page.title.toLowerCase() }} records.</p></div><label class="records-search"><span>⌕</span><input type="search" placeholder="Search records…" (input)="onSearch($event)" /></label></div><div class="table-note"><span class="live-dot"></span> {{ filteredRows().length }} records <span>·</span> Demo data</div><app-data-table [columns]="page.columns" [data]="filteredRows()"></app-data-table></section>
+</section>
