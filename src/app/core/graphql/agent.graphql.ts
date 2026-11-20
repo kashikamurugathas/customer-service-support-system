@@ -1,19 +1,19 @@
 export const GET_AGENTS_QUERY = `
-  query GetAgents($search: String, $status: String, $ordering: String, $page: Int, $pageSize: Int) {
-    agents(search: $search, status: $status, ordering: $ordering, page: $page, pageSize: $pageSize) {
-      totalCount
-      page
-      pageSize
-      results {
-        id
+  query GetAgents($search: String, $status: String, $page: Int, $pageSize: Int) {
+    allAgents(search: $search, status: $status, page: $page, pageSize: $pageSize) {
+      items {
         agentId
-        name
-        email
-        phone
         department
-        role
-        status
-        createdAt
+        availabilityStatus
+        userId {
+          fullName
+          email
+          role
+          createdAt
+        }
+      }
+      pagination {
+        totalItems
       }
     }
   }

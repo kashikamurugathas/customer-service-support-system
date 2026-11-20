@@ -124,24 +124,43 @@ export class AgentService {
     const variables = {
       search: filter?.search || null,
       status: filter?.status || null,
-      ordering: filter?.ordering || null,
       page: filter?.page || 1,
       pageSize: filter?.pageSize || 10,
     };
 
     interface AgentsResponse {
-      agents?: {
-        totalCount: number;
-        results: Agent[];
+      allAgents?: {
+        items: Array<{
+          agentId: string;
+          department: string;
+          availabilityStatus: string;
+          userId: {
+            fullName: string;
+            email: string;
+            role: string;
+            createdAt: string;
+          };
+        }>;
+        pagination: { totalItems: number };
       };
     }
 
     this.graphql.query<AgentsResponse>(GET_AGENTS_QUERY, variables).pipe(
       tap((data) => {
-        if (data.agents) {
+        if (data.allAgents) {
           this.backendConnected.set(true);
-          this.agents.set(data.agents.results);
-          this.totalCount.set(data.agents.totalCount);
+          this.agents.set(data.allAgents.items.map((agent): Agent => ({
+            id: agent.agentId,
+            agentId: agent.agentId,
+            name: agent.userId.fullName,
+            email: agent.userId.email,
+            phone: '—',
+            department: agent.department,
+            role: agent.userId.role,
+            status: agent.availabilityStatus as Agent['status'],
+            createdAt: agent.userId.createdAt,
+          })));
+          this.totalCount.set(data.allAgents.pagination.totalItems);
         }
         this.loading.set(false);
       }),
