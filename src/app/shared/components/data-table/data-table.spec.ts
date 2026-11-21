@@ -64,6 +64,82 @@ describe('DataTable Component', () => {
     expect(dataRows.length).toBe(mockData.length);
   });
 
+  it('should hide and restore columns without losing their configured order', async () => {
+    componentRef.setInput('columns', mockColumns);
+    componentRef.setInput('data', mockData);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const emailOption = Array.from(
+      compiled.querySelectorAll<HTMLLabelElement>('.column-visibility-option')
+    ).find((label) => label.textContent?.includes('Email'));
+    const emailCheckbox = emailOption?.querySelector('input') as HTMLInputElement;
+    expect(emailOption).toBeTruthy();
+    emailCheckbox.checked = false;
+    emailCheckbox.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    expect(Array.from(compiled.querySelectorAll('thead th')).some(
+      (header) => header.textContent?.includes('Email')
+    )).toBe(false);
+
+    const restoredEmailOption = Array.from(
+      compiled.querySelectorAll<HTMLLabelElement>('.column-visibility-option')
+    ).find((label) => label.textContent?.includes('Email'));
+    const restoredEmailCheckbox = restoredEmailOption?.querySelector('input') as HTMLInputElement;
+    expect(restoredEmailOption).toBeTruthy();
+    restoredEmailCheckbox.checked = true;
+    restoredEmailCheckbox.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    const headers = Array.from(compiled.querySelectorAll('thead th'));
+    expect(headers.some((header) => header.textContent?.includes('Email'))).toBe(true);
+    expect(headers.map((header) => header.querySelector('.th-label')?.textContent?.trim())).toEqual([
+      'ID',
+      'Name',
+      'Email',
+      'Status',
+      'Priority',
+      'Biography',
+    ]);
+  });
+
+  it('should reorder columns with the accessible column controls', async () => {
+    componentRef.setInput('columns', mockColumns);
+    componentRef.setInput('data', mockData);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    component.moveColumn('email', -1);
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const headers = Array.from(compiled.querySelectorAll('thead th'));
+    expect(headers.map((header) => header.querySelector('.th-label')?.textContent?.trim())).toEqual([
+      'ID',
+      'Email',
+      'Name',
+      'Status',
+      'Priority',
+      'Biography',
+    ]);
+  });
+
+  it('should offer the required page-size options', async () => {
+    componentRef.setInput('columns', mockColumns);
+    componentRef.setInput('data', mockData);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const options = Array.from(
+      compiled.querySelectorAll<HTMLOptionElement>('.page-size-select option')
+    ).map((option) => Number(option.value));
+
+    expect(options).toEqual([10, 20, 50]);
+  });
+
   it('should sort data in ascending and descending order when sortable header is clicked', async () => {
     componentRef.setInput('columns', mockColumns);
     componentRef.setInput('data', mockData);
@@ -71,7 +147,7 @@ describe('DataTable Component', () => {
     await fixture.whenStable();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    const nameHeader = compiled.querySelectorAll('thead th')[1] as HTMLElement;
+    const nameHeader = compiled.querySelectorAll('thead th')[1].querySelector('.sort-button') as HTMLButtonElement;
 
     // Click to sort asc by Name
     nameHeader.click();
@@ -168,6 +244,10 @@ describe('DataTable Component', () => {
     expect(component.totalPages()).toBe(10);
     component.goToPage(3);
     expect(component.currentPage()).toBe(3);
+
+    component.toggleSort(mockColumns[1]);
+    component.toggleSort(mockColumns[1]);
+    expect(component.pagedData()[0].name).toBe('Evan Wright');
 
     const searchInput = fixture.nativeElement.querySelector('.table-search-input') as HTMLInputElement;
     searchInput.value = 'query';

@@ -1,4 +1,11 @@
-import { Component, computed, input, model, output } from '@angular/core';
+import { Component, computed, input, model, output, signal } from '@angular/core';
+import {
+  CdkDrag,
+  CdkDragDrop,
+  CdkDragHandle,
+  CdkDropList,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
 import {
   ColumnType,
   TableActionConfig,
@@ -17,7 +24,7 @@ export type {
 
 @Component({
   selector: 'app-data-table',
-  imports: [],
+  imports: [CdkDrag, CdkDragHandle, CdkDropList],
   templateUrl: './data-table.html',
   styleUrl: './data-table.css',
   host: {
@@ -47,7 +54,7 @@ export class DataTable<T extends Record<string, unknown> = Record<string, unknow
   readonly searchPlaceholder = input<string>('Search records…');
   readonly emptyTitle = input<string>('No records found');
   readonly emptyMessage = input<string>('There are no records matching your criteria.');
-  readonly pageSizeOptions = input<number[]>([10, 25, 50, 100]);
+  readonly pageSizeOptions = input<number[]>([10, 20, 50]);
 
   // Two-way bound models
   readonly searchQuery = model<string>('');
@@ -56,6 +63,9 @@ export class DataTable<T extends Record<string, unknown> = Record<string, unknow
   readonly sortKey = model<string | null>(null);
   readonly sortDirection = model<'asc' | 'desc' | null>(null);
   readonly selectedRows = model<T[]>([]);
+
+  private readonly columnOrder = signal<string[]>([]);
+  private readonly hiddenColumnKeys = signal<Set<string>>(new Set());
 
   // Action & event outputs
   readonly view = output<T>();
@@ -90,6 +100,26 @@ export class DataTable<T extends Record<string, unknown> = Record<string, unknow
     return cols;
   });
 
+  readonly orderedColumns = computed(() => {
+    const columns = this.effectiveColumns();
+    const order = this.columnOrder();
+    if (order.length === 0) return columns;
+
+    const columnsByKey = new Map<string, TableColumn<T>>(
+      columns.map((column): [string, TableColumn<T>] => [column.key, column])
+    );
+    const ordered = order.flatMap((key) => {
+      const column = columnsByKey.get(key);
+      return column ? [column] : [];
+    });
+    const orderedKeys = new Set(order);
+    return [...ordered, ...columns.filter((column) => !orderedKeys.has(column.key))];
+  });
+
+  readonly visibleColumns = computed(() =>
+    this.orderedColumns().filter((column) => !this.hiddenColumnKeys().has(column.key))
+  );
+
   readonly filteredData = computed(() => {
     if (this.serverSide()) {
       return this.data();
@@ -116,10 +146,6 @@ export class DataTable<T extends Record<string, unknown> = Record<string, unknow
   });
 
   readonly sortedData = computed(() => {
-    if (this.serverSide()) {
-      return this.filteredData();
-    }
-
     const list = [...this.filteredData()];
     const key = this.sortKey();
     const dir = this.sortDirection();
@@ -223,7 +249,7 @@ export class DataTable<T extends Record<string, unknown> = Record<string, unknow
   });
 
   readonly totalColumnCount = computed(() => {
-    let count = this.effectiveColumns().length;
+    let count = this.visibleColumns().length;
     if (this.selectable()) count += 1;
     return Math.max(1, count);
   });
@@ -314,6 +340,57 @@ export class DataTable<T extends Record<string, unknown> = Record<string, unknow
       this.pageSize.set(newSize);
       this.currentPage.set(1);
     }
+  }
+
+  isColumnVisible(columnKey: string): boolean {
+    return !this.hiddenColumnKeys().has(columnKey);
+  }
+
+  canHideColumn(columnKey: string): boolean {
+    return !this.isColumnVisible(columnKey) || this.visibleColumns().length > 1;
+  }
+
+  toggleColumnVisibility(columnKey: string, event: Event): void {
+    const visible = (event.target as HTMLInputElement).checked;
+    if (!visible && !this.canHideColumn(columnKey)) return;
+
+    this.hiddenColumnKeys.update((hiddenKeys) => {
+      const updated = new Set(hiddenKeys);
+      if (visible) updated.delete(columnKey);
+      else updated.add(columnKey);
+      return updated;
+    });
+  }
+
+  canMoveColumn(columnKey: string, direction: -1 | 1): boolean {
+    const index = this.orderedColumns().findIndex((column) => column.key === columnKey);
+    const targetIndex = index + direction;
+    return index >= 0 && targetIndex >= 0 && targetIndex < this.orderedColumns().length;
+  }
+
+  moveColumn(columnKey: string, direction: -1 | 1): void {
+    const columns = this.orderedColumns();
+    const currentIndex = columns.findIndex((column) => column.key === columnKey);
+    const targetIndex = currentIndex + direction;
+    if (currentIndex < 0 || targetIndex < 0 || targetIndex >= columns.length) return;
+
+    const order = columns.map((column) => column.key);
+    moveItemInArray(order, currentIndex, targetIndex);
+    this.columnOrder.set(order);
+  }
+
+  reorderColumns(event: CdkDragDrop<TableColumn<T>[]>): void {
+    if (event.previousIndex === event.currentIndex) return;
+
+    const visibleKeys = this.visibleColumns().map((column) => column.key);
+    moveItemInArray(visibleKeys, event.previousIndex, event.currentIndex);
+
+    const visibleKeySet = new Set(this.visibleColumns().map((column) => column.key));
+    let visibleIndex = 0;
+    const order = this.orderedColumns().map((column) =>
+      visibleKeySet.has(column.key) ? visibleKeys[visibleIndex++] : column.key
+    );
+    this.columnOrder.set(order);
   }
 
   isRowSelected(row: T): boolean {

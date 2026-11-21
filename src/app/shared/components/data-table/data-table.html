@@ -1,8 +1,8 @@
 <div class="data-table-wrapper">
 
   <!-- Search & Toolbar Header -->
-  @if (searchable()) {
-    <div class="table-toolbar">
+  <div class="table-toolbar">
+    @if (searchable()) {
       <div class="table-search-box">
         <span class="search-icon" aria-hidden="true">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -30,12 +30,49 @@
           </button>
         }
       </div>
+    }
 
-      <div class="table-toolbar-actions">
-        <ng-content select="[table-actions]"></ng-content>
-      </div>
+    <div class="table-toolbar-actions">
+      @if (effectiveColumns().length > 0) {
+        <details class="column-menu">
+          <summary class="column-menu-trigger">Columns</summary>
+          <div class="column-menu-panel">
+            <p class="column-menu-help">Choose visible columns and adjust their order.</p>
+            @for (column of orderedColumns(); track column.key) {
+              <div class="column-menu-item">
+                <label class="column-visibility-option">
+                  <input
+                    type="checkbox"
+                    [checked]="isColumnVisible(column.key)"
+                    [disabled]="!canHideColumn(column.key)"
+                    (change)="toggleColumnVisibility(column.key, $event)"
+                  />
+                  <span>{{ column.label }}</span>
+                </label>
+                <div class="column-order-controls" [attr.aria-label]="'Reorder ' + column.label">
+                  <button
+                    type="button"
+                    class="column-order-button"
+                    [disabled]="!canMoveColumn(column.key, -1)"
+                    [attr.aria-label]="'Move ' + column.label + ' left'"
+                    (click)="moveColumn(column.key, -1)"
+                  >←</button>
+                  <button
+                    type="button"
+                    class="column-order-button"
+                    [disabled]="!canMoveColumn(column.key, 1)"
+                    [attr.aria-label]="'Move ' + column.label + ' right'"
+                    (click)="moveColumn(column.key, 1)"
+                  >→</button>
+                </div>
+              </div>
+            }
+          </div>
+        </details>
+      }
+      <ng-content select="[table-actions]"></ng-content>
     </div>
-  }
+  </div>
 
   <!-- Active Row Selection Banner -->
   @if (selectable() && selectedRows().length > 0) {
@@ -61,7 +98,13 @@
   <div class="table-scroll-container">
     <table class="data-table" [attr.aria-busy]="loading()">
       <thead>
-        <tr>
+        <tr
+          cdkDropList
+          cdkDropListOrientation="horizontal"
+          [cdkDropListData]="visibleColumns()"
+          [cdkDropListDisabled]="visibleColumns().length < 2"
+          (cdkDropListDropped)="reorderColumns($event)"
+        >
           @if (selectable()) {
             <th scope="col" class="checkbox-th">
               <span class="sr-only">Select all</span>
@@ -76,41 +119,58 @@
             </th>
           }
 
-          @for (column of effectiveColumns(); track column.key) {
+          @for (column of visibleColumns(); track column.key) {
             <th
+              cdkDrag
+              cdkDragLockAxis="x"
               scope="col"
               [class.sortable-th]="isColumnSortable(column)"
               [class.th-sorted]="sortKey() === column.key"
               [style.width]="column.width || null"
               [style.text-align]="column.align || 'left'"
               [attr.aria-sort]="getAriaSort(column)"
-              (click)="toggleSort(column)"
             >
               <div
                 class="th-content"
                 [class.th-align-right]="column.align === 'right'"
                 [class.th-align-center]="column.align === 'center'"
               >
-                <span class="th-label">{{ column.label }}</span>
                 @if (isColumnSortable(column)) {
-                  <span class="sort-icon-box" aria-hidden="true">
-                    @if (sortKey() === column.key) {
-                      @if (sortDirection() === 'asc') {
-                        <svg class="sort-icon active" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                          <polyline points="18 15 12 9 6 15"></polyline>
-                        </svg>
-                      } @else if (sortDirection() === 'desc') {
-                        <svg class="sort-icon active" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                          <polyline points="6 9 12 15 18 9"></polyline>
+                  <button
+                    type="button"
+                    class="sort-button"
+                    [attr.aria-label]="'Sort by ' + column.label"
+                    (click)="toggleSort(column)"
+                  >
+                    <span class="th-label">{{ column.label }}</span>
+                    <span class="sort-icon-box" aria-hidden="true">
+                      @if (sortKey() === column.key) {
+                        @if (sortDirection() === 'asc') {
+                          <svg class="sort-icon active" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="18 15 12 9 6 15"></polyline>
+                          </svg>
+                        } @else if (sortDirection() === 'desc') {
+                          <svg class="sort-icon active" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        }
+                      } @else {
+                        <svg class="sort-icon inactive" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M7 15l5 5 5-5M7 9l5-5 5 5"></path>
                         </svg>
                       }
-                    } @else {
-                      <svg class="sort-icon inactive" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M7 15l5 5 5-5M7 9l5-5 5 5"></path>
-                      </svg>
-                    }
-                  </span>
+                    </span>
+                  </button>
+                } @else {
+                  <span class="th-label">{{ column.label }}</span>
                 }
+                <button
+                  type="button"
+                  class="column-drag-handle"
+                  cdkDragHandle
+                  [attr.aria-label]="'Drag to reorder ' + column.label"
+                  title="Drag to reorder"
+                >⠿</button>
               </div>
             </th>
           }
@@ -127,7 +187,7 @@
                   <div class="skeleton-shimmer skeleton-checkbox"></div>
                 </td>
               }
-              @for (column of effectiveColumns(); track column.key) {
+              @for (column of visibleColumns(); track column.key) {
                 <td>
                   <div
                     class="skeleton-shimmer skeleton-bar"
@@ -198,7 +258,7 @@
                 </td>
               }
 
-              @for (column of effectiveColumns(); track column.key) {
+              @for (column of visibleColumns(); track column.key) {
                 <td
                   [style.text-align]="column.align || 'left'"
                   [class.actions-td]="getColumnType(column) === 'actions'"
