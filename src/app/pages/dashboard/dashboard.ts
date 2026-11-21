@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { Table } from '../../components/table/table';
+import { Dashboard as LiveSupportDashboard } from '../../features/dashboard/dashboard';
 
 @Component({
-  imports: [Table],
-  selector: 'app-dashboard',
+  imports: [LiveSupportDashboard],
+  selector: 'app-overview-dashboard',
   styleUrl: './dashboard.css',
   templateUrl: './dashboard.html',
 })

@@ -1,36 +1,38 @@
 <section class="dashboard-page">
-  <div class="page-heading">
+  <header class="page-heading">
     <div>
       <div class="eyebrow"><span class="live-dot"></span> LIVE SUPPORT DATA</div>
-      <h1>Support overview <span class="wave">✦</span></h1>
-      <p>Current ticket records from the Django GraphQL API.</p>
+      <h1>Support overview</h1>
+      <p>Ticket records and totals returned by the Django GraphQL API.</p>
     </div>
-  </div>
+  </header>
 
   <div class="metric-grid">
     <article class="metric-card">
-      <div class="metric-top"><span class="metric-label">Total tickets</span><span class="metric-icon metric-blue">▤</span></div>
+      <div class="metric-top">
+        <span class="metric-label">Total tickets</span>
+        <span class="metric-icon metric-blue" aria-hidden="true">▤</span>
+      </div>
       <div class="metric-value">{{ totalTickets() ?? '—' }}</div>
-      <div class="metric-foot"><span>Reported by the backend</span></div>
+      <div class="metric-foot">Reported by the backend</div>
     </article>
-    <article class="metric-card"><div class="metric-top"><span class="metric-label">Open tickets</span><span class="metric-icon metric-amber">◷</span></div><div class="metric-value">—</div><div class="metric-foot"><span>No aggregate query is exposed</span></div></article>
-    <article class="metric-card"><div class="metric-top"><span class="metric-label">Avg. response time</span><span class="metric-icon metric-violet">◴</span></div><div class="metric-value">—</div><div class="metric-foot"><span>No aggregate query is exposed</span></div></article>
-    <article class="metric-card"><div class="metric-top"><span class="metric-label">Customer satisfaction</span><span class="metric-icon metric-green">♡</span></div><div class="metric-value">—</div><div class="metric-foot"><span>No aggregate query is exposed</span></div></article>
   </div>
 
   <section class="panel tickets-panel">
     <div class="panel-heading tickets-heading">
-      <div><h2>Recent tickets</h2><p>Latest ticket records returned by the backend</p></div>
+      <div>
+        <h2>Tickets</h2>
+        <p>Ticket records returned by the backend</p>
+      </div>
     </div>
-    @if (error()) {
-      <p class="dashboard-error" role="alert">{{ error() }}</p>
-    }
     <app-data-table
       [columns]="columns"
       [data]="tickets()"
       [loading]="loading()"
+      [errorMessage]="error()"
       [emptyTitle]="'No tickets available'"
       [emptyMessage]="'The backend has not returned any ticket records.'"
+      (retry)="loadTickets()"
     ></app-data-table>
   </section>
 </section>

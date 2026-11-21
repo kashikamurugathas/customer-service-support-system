@@ -1,47 +1,31 @@
 import { Component, inject, signal } from '@angular/core';
 import { DataTable, TableColumn } from '../../shared/components/data-table/data-table';
 import { GraphQLService } from '../../core/graphql/graphql.service';
-import { catchError, of, tap } from 'rxjs';
+import { GET_TICKETS_QUERY } from '../../core/graphql/management.graphql';
+import { EMPTY, catchError, map } from 'rxjs';
 
 interface TicketRow extends Record<string, unknown> {
-  ticketNumber: string;
-  customerName: string;
-  subject: string;
-  status: string;
-  priority: string;
+  ticketNumber: string | null;
+  customerName: string | null;
+  subject: string | null;
+  status: string | null;
+  priority: string | null;
 }
 
 interface TicketsResponse {
   allTickets?: {
-    items: Array<{
-      ticketNumber: string;
-      ticketStatus: string;
-      priority: { priorityName: string };
+    items?: Array<{
+      ticketNumber: string | null;
+      ticketStatus: string | null;
+      priority: { priorityName: string | null } | null;
       complaint: {
-        complaintSubject: string;
-        customer: { userId: { fullName: string } };
-      };
-    }>;
-    pagination: { totalItems: number };
-  };
+        complaintSubject: string | null;
+        customer: { userId: { fullName: string | null } | null } | null;
+      } | null;
+    } | null> | null;
+    pagination?: { totalItems?: number | null } | null;
+  } | null;
 }
-
-const RECENT_TICKETS_QUERY = `
-  query RecentTickets($page: Int, $pageSize: Int) {
-    allTickets(page: $page, pageSize: $pageSize) {
-      items {
-        ticketNumber
-        ticketStatus
-        priority { priorityName }
-        complaint {
-          complaintSubject
-          customer { userId { fullName } }
-        }
-      }
-      pagination { totalItems }
-    }
-  }
-`;
 
 @Component({
   selector: 'app-dashboard',
@@ -65,26 +49,40 @@ export class Dashboard {
   readonly error = signal<string | null>(null);
 
   constructor() {
+    this.loadTickets();
+  }
+
+  loadTickets(): void {
     this.loading.set(true);
-    this.graphql.query<TicketsResponse>(RECENT_TICKETS_QUERY, { page: 1, pageSize: 5 }).pipe(
-      tap((response) => {
+    this.error.set(null);
+    this.graphql.query<TicketsResponse>(GET_TICKETS_QUERY, {
+      page: 1,
+      pageSize: 5,
+      search: null,
+      status: null,
+    }).pipe(
+      map((response) => {
         const result = response.allTickets;
         if (!result) throw new Error('The backend returned no ticket list.');
-        this.totalTickets.set(result.pagination.totalItems);
-        this.tickets.set(result.items.map((ticket) => ({
+        return result;
+      }),
+      catchError((error: unknown) => {
+        this.error.set(error instanceof Error ? error.message : String(error));
+        this.totalTickets.set(null);
+        this.tickets.set([]);
+        this.loading.set(false);
+        return EMPTY;
+      })
+    ).subscribe((result) => {
+        this.totalTickets.set(result.pagination?.totalItems ?? null);
+        this.tickets.set((result.items ?? []).filter((ticket) => ticket !== null).map((ticket) => ({
           ticketNumber: ticket.ticketNumber,
-          customerName: ticket.complaint.customer.userId.fullName,
-          subject: ticket.complaint.complaintSubject,
+          customerName: ticket.complaint?.customer?.userId?.fullName ?? null,
+          subject: ticket.complaint?.complaintSubject ?? null,
           status: ticket.ticketStatus,
-          priority: ticket.priority.priorityName,
+          priority: ticket.priority?.priorityName ?? null,
         })));
         this.loading.set(false);
-      }),
-      catchError((error: Error) => {
-        this.error.set(error.message);
-        this.loading.set(false);
-        return of(null);
-      })
-    ).subscribe();
+    });
   }
 }
