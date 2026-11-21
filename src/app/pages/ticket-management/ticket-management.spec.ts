@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
+import { GraphQLService } from '../../core/graphql/graphql.service';
 import { TicketManagement } from './ticket-management';
 
 describe('TicketManagement', () => {
@@ -8,6 +10,10 @@ describe('TicketManagement', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TicketManagement],
+      providers: [{
+        provide: GraphQLService,
+        useValue: { query: () => of({ allTickets: { items: [], pagination: { totalItems: 0 } } }) },
+      }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TicketManagement);

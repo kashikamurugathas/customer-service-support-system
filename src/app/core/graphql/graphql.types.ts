@@ -28,3 +28,17 @@ export interface PageInfo {
   endCursor?: string;
   totalCount?: number;
 }
+
+export interface GraphQLPagination {
+  currentPage?: number | null;
+  perPage?: number | null;
+  totalPages?: number | null;
+  totalItems?: number | null;
+  hasNext?: boolean | null;
+  hasPrevious?: boolean | null;
+}
+
+export interface PaginatedGraphQLResult<T> {
+  items?: Array<T | null> | null;
+  pagination?: GraphQLPagination | null;
+}

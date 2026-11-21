@@ -1,1 +1,26 @@
-<p>priority-management works!</p>
+<section class="space-y-6 p-4 md:p-6">
+  <header>
+    <p class="text-sm font-semibold tracking-wide text-indigo-600">CUSTOMER OPERATIONS / PRIORITIES</p>
+    <h1 class="mt-2 text-2xl font-semibold text-slate-900">Priority Management</h1>
+    <p class="mt-1 text-sm text-slate-600">Priority levels and descriptions from the backend.</p>
+  </header>
+
+  <app-data-table
+    [columns]="columns"
+    [data]="priorities()"
+    [loading]="loading()"
+    [errorMessage]="error()"
+    [serverSide]="true"
+    [totalRecords]="totalRecords()"
+    [selectable]="true"
+    [pageSize]="pageSize()"
+    (pageSizeChange)="pageSize.set($event); load()"
+    [currentPage]="page()"
+    (currentPageChange)="page.set($event); load()"
+    [searchPlaceholder]="'Search priority name or description'"
+    (searchChange)="onSearch($event)"
+    [emptyTitle]="'No priorities found'"
+    [emptyMessage]="'The backend returned no priority records.'"
+    (retry)="load()"
+  ></app-data-table>
+</section>

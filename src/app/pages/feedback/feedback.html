@@ -1,1 +1,26 @@
-<p>feedback works!</p>
+<section class="space-y-6 p-4 md:p-6">
+  <header>
+    <p class="text-sm font-semibold tracking-wide text-indigo-600">CUSTOMER OPERATIONS / FEEDBACK</p>
+    <h1 class="mt-2 text-2xl font-semibold text-slate-900">Feedback Management</h1>
+    <p class="mt-1 text-sm text-slate-600">Customer ratings and comments linked to tickets where available.</p>
+  </header>
+
+  <app-data-table
+    [columns]="columns"
+    [data]="feedback()"
+    [loading]="loading()"
+    [errorMessage]="error()"
+    [serverSide]="true"
+    [totalRecords]="totalRecords()"
+    [selectable]="true"
+    [pageSize]="pageSize()"
+    (pageSizeChange)="pageSize.set($event); load()"
+    [currentPage]="page()"
+    (currentPageChange)="page.set($event); load()"
+    [searchPlaceholder]="'Search feedback comments'"
+    (searchChange)="onSearch($event)"
+    [emptyTitle]="'No feedback found'"
+    [emptyMessage]="'The backend returned no feedback records.'"
+    (retry)="load()"
+  ></app-data-table>
+</section>

@@ -1,1 +1,26 @@
-<p>agent-management works!</p>
+<section class="space-y-6 p-4 md:p-6">
+  <header>
+    <p class="text-sm font-semibold tracking-wide text-indigo-600">CUSTOMER OPERATIONS / AGENTS</p>
+    <h1 class="mt-2 text-2xl font-semibold text-slate-900">Agent Management</h1>
+    <p class="mt-1 text-sm text-slate-600">Agents and their current availability from the Django GraphQL API.</p>
+  </header>
+
+  <app-data-table
+    [columns]="columns"
+    [data]="agents()"
+    [loading]="loading()"
+    [errorMessage]="error()"
+    [serverSide]="true"
+    [totalRecords]="totalRecords()"
+    [selectable]="true"
+    [pageSize]="pageSize()"
+    (pageSizeChange)="pageSize.set($event); load()"
+    [currentPage]="page()"
+    (currentPageChange)="page.set($event); load()"
+    [searchPlaceholder]="'Search by agent email or department'"
+    (searchChange)="onSearch($event)"
+    [emptyTitle]="'No agents found'"
+    [emptyMessage]="'The backend returned no agent records.'"
+    (retry)="load()"
+  ></app-data-table>
+</section>

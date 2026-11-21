@@ -1,1 +1,41 @@
-<p>service-level-agreement-management works!</p>
+<section class="space-y-6 p-4 md:p-6">
+  <header>
+    <p class="text-sm font-semibold tracking-wide text-indigo-600">CUSTOMER OPERATIONS / SERVICE LEVELS</p>
+    <h1 class="mt-2 text-2xl font-semibold text-slate-900">SLA Management</h1>
+    <p class="mt-1 text-sm text-slate-600">SLA rules and ticket tracking records returned by the backend.</p>
+  </header>
+
+  <div class="flex flex-wrap gap-2" role="group" aria-label="SLA data type">
+    <button
+      type="button"
+      class="rounded-md border px-4 py-2 text-sm font-medium"
+      [class.bg-indigo-600]="activeView() === 'rules'"
+      [class.text-white]="activeView() === 'rules'"
+      [attr.aria-pressed]="activeView() === 'rules'"
+      (click)="selectView('rules')"
+    >SLA Rules</button>
+    <button
+      type="button"
+      class="rounded-md border px-4 py-2 text-sm font-medium"
+      [class.bg-indigo-600]="activeView() === 'tracking'"
+      [class.text-white]="activeView() === 'tracking'"
+      [attr.aria-pressed]="activeView() === 'tracking'"
+      (click)="selectView('tracking')"
+    >SLA Tracking</button>
+  </div>
+
+  <app-data-table
+    [columns]="columns()"
+    [data]="activeRows()"
+    [loading]="loading()"
+    [errorMessage]="error()"
+    [selectable]="true"
+    [(currentPage)]="page"
+    [(pageSize)]="pageSize"
+    [(searchQuery)]="search"
+    [searchPlaceholder]="'Search the loaded SLA records'"
+    [emptyTitle]="activeView() === 'rules' ? 'No SLA rules found' : 'No SLA tracking records found'"
+    [emptyMessage]="'The backend returned no records for this view.'"
+    (retry)="retryActiveView()"
+  ></app-data-table>
+</section>
